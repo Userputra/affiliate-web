@@ -4,9 +4,6 @@ import path from "path";
 const nextConfig: NextConfig = {
   /* config options here */
   outputFileTracingRoot: path.join(__dirname),
-  experimental: {
-    webpackBuildWorker: false,
-  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.supabase.co' },
