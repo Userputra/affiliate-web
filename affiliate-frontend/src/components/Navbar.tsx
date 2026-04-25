@@ -28,7 +28,7 @@ export default function Navbar({ onSearch, onMenuClick }: NavbarProps) {
         </button>
 
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold text-orange-600 `flex-shrink-0`">
+        <Link href="/" className="text-xl font-bold text-orange-600 flex-shrink-0">
           AFFILIATE<span className="text-gray-800">MATE</span>
         </Link>
 

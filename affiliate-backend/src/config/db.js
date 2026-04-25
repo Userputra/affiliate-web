@@ -1,23 +1,21 @@
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+require('dotenv').config();
 const { Pool } = require('pg');
 
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: {
-//     rejectUnauthorized: false // Diperlukan agar bisa terhubung ke cloud database Supabase
-//   }
-// });
-const pool = new Pool({
-  user: 'postgres',
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD, // Langsung tulis apa adanya
-  port: process.env.PORT || 5432,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const dbConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+    }
+  : {
+      user: process.env.DB_USER || process.env.USER || 'postgres',
+      host: process.env.DB_HOST || process.env.HOST,
+      database: process.env.DB_NAME || process.env.DATABASE,
+      password: process.env.DB_PASSWORD || process.env.PASSWORD,
+      port: Number(process.env.DB_PORT || process.env.PGPORT || 5432),
+      ssl: { rejectUnauthorized: false },
+    };
+
+const pool = new Pool(dbConfig);
 
 pool.on('connect', () => {
   console.log('Terhubung ke Database Supabase (PostgreSQL)');
@@ -26,7 +24,5 @@ pool.on('connect', () => {
 pool.on('error', (err) => {
   console.error('Koneksi database terputus:', err);
 });
-
-console.log("Cek DATABASE_URL:", process.env.HOST, process.env.DATABASE, process.env.PASSWORD, process.env.PORT);
 
 module.exports = pool;

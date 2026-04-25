@@ -1,24 +1,30 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+
+interface Product {
+  id: number;
+  name: string;
+  price_discount: number | string;
+}
 
 export default function AdminPage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [form, setForm] = useState({
     name: "", price_original: "", price_discount: "",
     image_url: "", affiliate_link: "", category: "", source_marketplace: "Shopee"
   });
 
   const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_KEY; // Sesuaikan dengan .env backend
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
   
 
   // Load produk untuk daftar hapus
-  const fetchProducts = () => {
+  const fetchProducts = useCallback(() => {
     fetch(`${API_URL}/products`).then(res => res.json()).then(setProducts);
-  };
+  }, [API_URL]);
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +86,7 @@ export default function AdminPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((p: any) => (
+            {products.map((p) => (
               <tr key={p.id} className="border-t">
                 <td className="p-4 truncate max-w-[200px]">{p.name}</td>
                 <td className="p-4 text-orange-600 font-bold">Rp {Number(p.price_discount).toLocaleString()}</td>

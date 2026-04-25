@@ -13,20 +13,19 @@ interface Product {
 }
 
 export default function Home() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
+    fetch(`${API_URL}/products`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
           setProducts(data);
-          setFilteredProducts(data); // Default: tampilkan semua
         }
         setIsLoading(false); // Matikan loading jika data sudah sampai
       })
@@ -34,10 +33,10 @@ export default function Home() {
         console.error("Gagal:", err);
         setIsLoading(false);
       });
-  }, []);
+  }, [API_URL]);
 
- // Logika Filter gabungan (Kategori + Search)
-  useEffect(() => {
+  // Logika Filter gabungan (Kategori + Search)
+  const filteredProducts = useMemo(() => {
     let result = products;
 
     if (activeCategory !== "Semua") {
@@ -45,12 +44,12 @@ export default function Home() {
     }
 
     if (searchQuery) {
-      result = result.filter((p) => 
+      result = result.filter((p) =>
         p.name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    setFilteredProducts(result);
+    return result;
   }, [searchQuery, activeCategory, products]);
 
   // Ambil list kategori unik dari data produk

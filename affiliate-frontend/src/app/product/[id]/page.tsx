@@ -2,19 +2,32 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
+interface Product {
+  id: number | string;
+  name: string;
+  category: string;
+  source_marketplace: string;
+  image_url: string;
+  price_original: number;
+  price_discount: number;
+  affiliate_link: string;
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
+  const productId = Array.isArray(id) ? id[0] : id;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
+    if (productId) {
+      fetch(`${API_URL}/products`)
         .then((res) => res.json())
-        .then((data) => {
+        .then((data: Product[]) => {
           // Mencari produk yang spesifik berdasarkan ID
-          const found = data.find((p: any) => p.id.toString() === id);
-          setProduct(found);
+          const found = data.find((p) => p.id.toString() === productId);
+          setProduct(found ?? null);
           setLoading(false);
         })
         .catch((err) => {
@@ -22,7 +35,7 @@ export default function ProductDetail() {
           setLoading(false);
         });
     }
-  }, [id]);
+  }, [productId, API_URL]);
 
   if (loading) return <div className="p-10 text-center">Memuat detail produk...</div>;
   if (!product) return <div className="p-10 text-center">Produk tidak ditemukan.</div>;
